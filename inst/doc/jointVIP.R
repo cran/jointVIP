@@ -5,6 +5,9 @@ knitr::opts_chunk$set(
 )
 devtools::load_all(".")
 
+## ----download, eval=FALSE-----------------------------------------------------
+#  install.packages("jointVIP")
+
 ## ----setup, message=FALSE-----------------------------------------------------
 # install once its on CRAN!
 # install.packages("jointVIP")

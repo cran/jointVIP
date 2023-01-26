@@ -1,7 +1,7 @@
 Package: jointVIP
 Title: Prioritize Variables with Joint Variable Importance Plot in
         Observational Study Design
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(person(given = "Lauren D.",
            family = "Liao",
            role = c("aut", "cre"),
@@ -20,7 +20,10 @@ Description: In the observational study design stage, matching/weighting methods
     curves, derived using the classical omitted variable bias framework. The joint
     variable importance plots translate variable importance into recommended values for
     tuning parameters in existing methods. Post-matching and/or weighting plots can also
-    be used to visualize and assess the quality of the observational study design.
+    be used to visualize and assess the quality of the observational study design. The
+    package and its usage is showcased in "Using Joint Variable Importance Plots to 
+    Prioritize Variables in Assessing the Impact of Glyburide on Adverse Birth Outcomes" by 
+    Liao et al. (2023) <arXiv:2301.09754>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.2.1
@@ -35,9 +38,9 @@ VignetteBuilder: knitr
 URL: https://github.com/ldliao/jointVIP
 BugReports: https://github.com/ldliao/jointVIP/issues
 NeedsCompilation: no
-Packaged: 2022-12-21 00:05:11 UTC; ldliao
+Packaged: 2023-01-26 06:46:21 UTC; ldliao
 Author: Lauren D. Liao [aut, cre] (<https://orcid.org/0000-0003-4697-6909>),
   Samuel D. Pimentel [aut] (<https://orcid.org/0000-0002-0409-6586>)
 Maintainer: Lauren D. Liao <ldliao@berkeley.edu>
 Repository: CRAN
-Date/Publication: 2022-12-21 12:20:06 UTC
+Date/Publication: 2023-01-26 09:30:20 UTC
