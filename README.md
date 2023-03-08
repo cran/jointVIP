@@ -11,15 +11,19 @@
 
 Joint variable importance plot (jointVIP) visualizes each variable’s
 outcome importance via Pearson’s correlation and treatment importance
-via omitted variable bias-based standardized mean differences. Bias
-curves enable comparisons to support prioritization.
+via cross-sample standardized mean differences. Bias curves enable
+comparisons to support prioritization.
 
 ## Installation
 
 You can install the `jointVIP` package on CRAN using:
 
 ``` r
+# for version on CRAN
 install.packages("jointVIP")
+
+# for development version on github
+devtools::install_github("ldliao/jointVIP")
 ```
 
 ## BRFSS Example

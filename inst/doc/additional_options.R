@@ -82,26 +82,26 @@ post_optmatch_jointVIP <- create_post_jointVIP(new_jointVIP,
 # summary(new_jointVIP)
 
 summary(new_jointVIP, 
-        smd = 'standard', 
+        smd = 'pooled', 
         use_abs = FALSE, 
         bias_tol = 0.005)
 
 print(new_jointVIP, 
-      smd = 'standard', 
+      smd = 'pooled', 
       use_abs = FALSE, 
       bias_tol = 0.005)
 
 # not run
-# get_measures(new_jointVIP, smd = 'OVB-based')
+# get_measures(new_jointVIP, smd = 'cross-sample')
 
 ## ----plot_ex, dpi=300, fig.asp = 0.75, fig.width = 6, out.width = "80%", fig.align = "center", message=FALSE----
 # # simplest usage
 # plot(new_jointVIP)
 
 plot(new_jointVIP, 
-     smd = 'standard', 
+     smd = 'pooled', 
      use_abs = FALSE, 
-     plot_title = 'Signed version of the jointVIP with standard/pooled SMD')
+     plot_title = 'Signed version of the jointVIP with pooled SMD')
 
 plot(new_jointVIP, 
      bias_curve_cutoffs = c(0.005, 0.05, 0.10),
@@ -115,13 +115,13 @@ plot(new_jointVIP,
      )
 
 plot(new_jointVIP, 
-     OVB_curves = FALSE,
+     bias_curves = FALSE,
      add_var_labs = FALSE,
      plot_title = 'No bias curves or variable labels'
      )
 
 ## ----sumnprint_post, dpi=300, fig.asp = 0.75, fig.width = 6, out.width = "80%", fig.align = "center", message=FALSE----
-# get_post_measures(post_optmatch_jointVIP, smd = 'OVB-based')
+# get_post_measures(post_optmatch_jointVIP, smd = 'cross-sample')
 
 summary(post_optmatch_jointVIP,
         use_abs = FALSE,
@@ -133,7 +133,7 @@ print(post_optmatch_jointVIP,
 
 plot(post_optmatch_jointVIP, 
      plot_title = "Post-match jointVIP using rcbalance matching",
-     smd = 'OVB-based',
+     smd = 'cross-sample',
      use_abs = FALSE,
      add_post_labs = TRUE,
      post_label_cut_bias = 0.001)

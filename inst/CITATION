@@ -1,0 +1,10 @@
+bibentry(
+  "Article",
+  title = "{jointVIP}: Prioritizing variables in observational study design with joint variable importance plot in R",
+  author = c(
+  person("Lauren D.", "Liao"),
+  person("Samuel D.", "Pimentel")),
+  year = 2023,
+  journal = "arXiv",
+  url = "https://arxiv.org/abs/2302.10367",
+)

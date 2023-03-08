@@ -68,13 +68,13 @@ new_jointVIP = create_jointVIP(treatment = treatment,
 
 ## ----summary------------------------------------------------------------------
 summary(new_jointVIP, 
-        smd = "OVB-based",
+        smd = "cross-sample",
         use_abs = TRUE,
         bias_tol = 0.01)
 
 ## ----print--------------------------------------------------------------------
 print(new_jointVIP,
-      smd = "OVB-based",
+      smd = "cross-sample",
       use_abs = TRUE,
       bias_tol = 0.01)
 
@@ -101,10 +101,7 @@ optwt <- weightit(treat ~ log_re74 + log_re75,
                   tols = 0.005, include.obj = TRUE)
 # summary(optwt)
 
-optwt_df = ordered_analysis_df[row.names(optwt$covs),
-                               covariates] * optwt$weights
-optwt_df$treat = optwt$treat
-optwt_df$log_re78 = analysis_df[row.names(optwt$covs), 'log_re78']
+optwt_df = ordered_analysis_df[, c(covariates, treatment, outcome)]
 
 ## ----post_opt, dpi=300, fig.asp = 0.75, fig.width = 6, out.width = "80%", fig.align = "center", message=FALSE----
 post_optmatch_jointVIP <- create_post_jointVIP(new_jointVIP, 
@@ -112,12 +109,15 @@ post_optmatch_jointVIP <- create_post_jointVIP(new_jointVIP,
 
 summary(post_optmatch_jointVIP)
 print(post_optmatch_jointVIP)
-plot(post_optmatch_jointVIP, plot_title = "Post-match jointVIP using optimal matching")
+plot(post_optmatch_jointVIP, 
+     plot_title = "Post-match jointVIP using optimal matching")
 
 ## ----post_wt, dpi=300, fig.asp = 0.75, fig.width = 6, out.width = "80%", fig.align = "center", message=FALSE----
 post_optwt_jointVIP = create_post_jointVIP(new_jointVIP,
-                                           post_analysis_df = optwt_df)
+                                           post_analysis_df = optwt_df,
+                                           wts = optwt$weights)
 summary(post_optwt_jointVIP)
 print(post_optwt_jointVIP)
-plot(post_optwt_jointVIP, plot_title = "Post-weighting jointVIP using optimal weighting")
+plot(post_optwt_jointVIP, 
+     plot_title = "Post-weighting jointVIP using optimal weighting")
 

@@ -109,6 +109,7 @@ create_jointVIP <- function(treatment,
 #' This is creates the post_jointVIP object & check inputs
 #' @param object a jointVIP object
 #' @param post_analysis_df post matched or weighted data.frame
+#' @param wts user-supplied weights
 #' @return a post_jointVIP object (subclass of jointVIP)
 #'
 #' @export
@@ -144,7 +145,8 @@ create_jointVIP <- function(treatment,
 #'                         out = rnorm(50, 1, 0.2))
 #' post_dat_jointVIP =  create_post_jointVIP(new_jointVIP, post_data)
 create_post_jointVIP <- function(object,
-                                 post_analysis_df) {
+                                 post_analysis_df, 
+                                 wts = NA) {
   if (all(dim(post_analysis_df) == c(0, 0))) {
     stop("`post_analysis_df` cannot be an empty data.frame")
   } else if (!"data.frame" %in% class(post_analysis_df)) {
@@ -162,13 +164,25 @@ create_post_jointVIP <- function(object,
     stop("`treatment` must be binary: 0 (control) and 1 (treated)")
   }
   
+  if(!all(is.na(wts) & length(wts) == 1)){
+    if(length(wts) != dim(post_analysis_df)[[1]]){
+      stop("length of `wts` must be the same number of rows as `post_analysis_df`")
+    }
+    if(!all(is.numeric(wts))){
+      stop("`wts` must be numeric")
+    }
+    if(any(is.na(wts) | all(wts ==  0))){
+      stop("`wts` cannot contain NA or all be 0")
+    }
+  } else {wts = rep(1, dim(post_analysis_df)[[1]])}
   structure(
     list(
       treatment = object$treatment,
       outcome = object$outcome,
       pilot_df = object$pilot_df,
       analysis_df = object$analysis_df,
-      post_analysis_df = post_analysis_df
+      post_analysis_df = post_analysis_df,
+      wts = wts
     ),
     class = c("post_jointVIP", "jointVIP")
   )
@@ -179,7 +193,7 @@ create_post_jointVIP <- function(object,
 #'
 #' @param object a jointVIP object
 #' @param ... not used
-#' @param smd specify the standardized mean difference is `OVB-based` or `standard`
+#' @param smd specify the standardized mean difference is `cross-sample` or `pooled`
 #' @param use_abs TRUE (default) for absolute measures
 #' @param bias_tol numeric 0.01 (default) any bias above the absolute bias_tol will be summarized
 #' @return no return value
@@ -208,7 +222,7 @@ create_post_jointVIP <- function(object,
 #' summary(new_jointVIP)
 summary.jointVIP <- function(object,
                              ...,
-                             smd = 'OVB-based',
+                             smd = 'cross-sample',
                              use_abs = TRUE,
                              bias_tol = 0.01) {
   if (any(is.null(names(list(...)))) & length(list(...)) > 0) {
@@ -254,7 +268,7 @@ summary.jointVIP <- function(object,
 #'
 #' @param object a post_jointVIP object
 #' @param ... not used
-#' @param smd specify the standardized mean difference is `OVB-based` or `standard`
+#' @param smd specify the standardized mean difference is `cross-sample` or `pooled`
 #' @param use_abs TRUE (default) for absolute measures
 #' @param bias_tol numeric 0.01 (default) any bias above the absolute bias_tol will be summarized
 #' @param post_bias_tol numeric 0.005 (default) any bias above the absolute bias_tol will be summarized
@@ -294,7 +308,7 @@ summary.jointVIP <- function(object,
 #' summary(post_dat_jointVIP)
 summary.post_jointVIP <- function(object,
                                   ...,
-                                  smd = 'OVB-based',
+                                  smd = 'cross-sample',
                                   use_abs = TRUE,
                                   bias_tol = 0.01,
                                   post_bias_tol = 0.005) {
@@ -327,7 +341,7 @@ summary.post_jointVIP <- function(object,
 #'
 #' @param x a jointVIP object
 #' @param ... not used
-#' @param smd specify the standardized mean difference is `OVB-based` or `standard`
+#' @param smd specify the standardized mean difference is `cross-sample` or `pooled`
 #' @param use_abs TRUE (default) for absolute measures
 #' @param bias_tol numeric 0.01 (default) any bias above the absolute bias_tol will be printed
 #'
@@ -357,7 +371,7 @@ summary.post_jointVIP <- function(object,
 #' print(new_jointVIP)
 print.jointVIP <- function(x,
                            ...,
-                           smd = 'OVB-based',
+                           smd = 'cross-sample',
                            use_abs = TRUE,
                            bias_tol = 0.01) {
   if (any(is.null(names(list(...)))) & length(list(...)) > 0) {
@@ -382,7 +396,7 @@ print.jointVIP <- function(x,
 #'
 #' @param x a post_jointVIP object
 #' @param ... not used
-#' @param smd specify the standardized mean difference is `OVB-based` or `standard`
+#' @param smd specify the standardized mean difference is `cross-sample` or `pooled`
 #' @param use_abs TRUE (default) for absolute measures
 #' @param bias_tol numeric 0.01 (default) any bias above the absolute bias_tol will be printed
 #'
@@ -422,7 +436,7 @@ print.jointVIP <- function(x,
 #' print(post_dat_jointVIP)
 print.post_jointVIP <- function(x,
                                 ...,
-                                smd = 'OVB-based',
+                                smd = 'cross-sample',
                                 use_abs = TRUE,
                                 bias_tol = 0.01) {
   if (use_abs) {
@@ -444,8 +458,8 @@ print.post_jointVIP <- function(x,
 #'
 #'
 #' @param x a jointVIP object
-#' @param ... custom options: `bias_curve_cutoffs`, `text_size`, `max.overlaps`, `label_cut_std_md`, `label_cut_outcome_cor`, `label_cut_bias`, `OVB_curves`, `add_var_labs`, `expanded_y_curvelab`
-#' @param smd specify the standardized mean difference is `OVB-based` or `standard`
+#' @param ... custom options: `bias_curve_cutoffs`, `text_size`, `max.overlaps`, `label_cut_std_md`, `label_cut_outcome_cor`, `label_cut_bias`, `bias_curves`, `add_var_labs`, `expanded_y_curvelab`
+#' @param smd specify the standardized mean difference is `cross-sample` or `pooled`
 #' @param use_abs TRUE (default) for absolute measures
 #' @param plot_title optional string for plot title
 #'
@@ -476,7 +490,7 @@ print.post_jointVIP <- function(x,
 #' plot(new_jointVIP)
 plot.jointVIP <- function(x,
                           ...,
-                          smd = 'OVB-based',
+                          smd = 'cross-sample',
                           use_abs = TRUE,
                           plot_title = "Joint Variable Importance Plot") {
   if (any(is.null(names(list(...)))) & length(list(...)) > 0) {
@@ -502,7 +516,7 @@ plot.jointVIP <- function(x,
           'label_cut_std_md',
           'label_cut_outcome_cor',
           'label_cut_bias',
-          'OVB_curves',
+          'bias_curves',
           'add_var_labs',
           'expanded_y_curvelab'
         )
@@ -516,7 +530,7 @@ plot.jointVIP <- function(x,
             ' label_cut_std_md',
             ' label_cut_outcome_cor',
             ' label_cut_bias',
-            ' OVB_curves',
+            ' bias_curves',
             ' add_var_labs',
             ' expanded_y_curvelab'
           )
@@ -531,7 +545,7 @@ plot.jointVIP <- function(x,
     measures = get_measures(x, smd = smd)
   }
   
-  if (smd == 'standard') {
+  if (smd == "pooled") {
     p <- ggplot(measures,
                 aes(x = .data$std_md,
                     y = .data$outcome_cor))  +
@@ -605,15 +619,15 @@ plot.jointVIP <- function(x,
       ), 2)))
   }
   
-  OVB_curves = list(...)[['OVB_curves']]
-  if (is.null(OVB_curves)) {
-    OVB_curves = TRUE
-  } else if (!is.logical(OVB_curves)) {
-    stop("`OVB_curves` can only be set as TRUE or FALSE")
+  bias_curves = list(...)[['bias_curves']]
+  if (is.null(bias_curves)) {
+    bias_curves = TRUE
+  } else if (!is.logical(bias_curves)) {
+    stop("`bias_curves` can only be set as TRUE or FALSE")
   }
-  if (OVB_curves) {
-    if (smd == "OVB-based") {
-      p <- add_OVB_curves(p,
+  if (bias_curves) {
+    if (smd == "cross-sample") {
+      p <- add_bias_curves(p,
                           use_abs = use_abs,
                           measures = measures, ...)
     }
@@ -638,7 +652,7 @@ plot.jointVIP <- function(x,
 #' @param ... encompasses other variables needed
 #' @return a joint variable importance plot of class `ggplot` with curves
 #' @import ggplot2
-add_OVB_curves <- function(p, ...) {
+add_bias_curves <- function(p, ...) {
   use_abs = list(...)[['use_abs']]
   measures = list(...)[['measures']]
   bias_curve_cutoffs = list(...)[['bias_curve_cutoffs']]
@@ -889,8 +903,8 @@ floor_dec <- function(num, dec_place = 1) {
 #'
 #'
 #' @param x a post_jointVIP object
-#' @param ... custom options: `bias_curve_cutoffs`, `text_size`, `max.overlaps`, `label_cut_std_md`, `label_cut_outcome_cor`, `label_cut_bias`, `OVB_curves`, `add_var_labs`, `expanded_y_curvelab`
-#' @param smd specify the standardized mean difference is `OVB-based` or `standard`
+#' @param ... custom options: `bias_curve_cutoffs`, `text_size`, `max.overlaps`, `label_cut_std_md`, `label_cut_outcome_cor`, `label_cut_bias`, `bias_curves`, `add_var_labs`, `expanded_y_curvelab`
+#' @param smd specify the standardized mean difference is `cross-sample` or `pooled`
 #' @param use_abs TRUE (default) for absolute measures
 #' @param plot_title optional string for plot title
 #' @param add_post_labs TRUE (default) show post-measure labels
@@ -934,7 +948,7 @@ floor_dec <- function(num, dec_place = 1) {
 #' plot(post_dat_jointVIP)
 plot.post_jointVIP <- function(x,
                                ...,
-                               smd = 'OVB-based',
+                               smd = 'cross-sample',
                                use_abs = TRUE,
                                plot_title = "Joint Variable Importance Plot",
                                add_post_labs = TRUE,
@@ -972,7 +986,7 @@ plot.post_jointVIP <- function(x,
     p$layers[[length(p$layers)]] <- NULL
   }
   
-  if (smd == 'standard') {
+  if (smd == "pooled") {
     p <- p + geom_point(data = post_measures,
                         aes(x = .data$post_std_md,
                             y = .data$outcome_cor))
@@ -1010,7 +1024,7 @@ plot.post_jointVIP <- function(x,
       post_measures[!(abs(round(post_measures$post_bias, 4)) >= post_label_cut_bias), 'text_label'] = ""
     }
     
-    if (smd == 'standard') {
+    if (smd == "pooled") {
       p <- p + geom_text_repel(
         data = post_measures,
         aes(
@@ -1058,8 +1072,8 @@ plot.post_jointVIP <- function(x,
 #'
 #'
 #' @param x a jointVIP object
-#' @param ... custom options: `bias_curve_cutoffs`, `text_size`, `max.overlaps`, `label_cut_std_md`, `label_cut_outcome_cor`, `label_cut_bias`, `OVB_curves`, `add_var_labs`
-#' @param smd specify the standardized mean difference is `OVB-based` or `standard`
+#' @param ... custom options: `bias_curve_cutoffs`, `text_size`, `max.overlaps`, `label_cut_std_md`, `label_cut_outcome_cor`, `label_cut_bias`, `bias_curves`, `add_var_labs`
+#' @param smd specify the standardized mean difference is `cross-sample` or `pooled`
 #' @param use_abs TRUE (default) for absolute measures
 #' @param plot_title optional string for plot title
 #' @param B 100 (default) for the number of times the bootstrap step wished to run
@@ -1094,7 +1108,7 @@ plot.post_jointVIP <- function(x,
 #' bootstrap.plot(new_jointVIP, B = 15)
 bootstrap.plot <- function(x,
                            ...,
-                           smd = 'OVB-based',
+                           smd = 'cross-sample',
                            use_abs = TRUE,
                            plot_title = "Joint Variable Importance Plot",
                            B = 100) {
@@ -1102,17 +1116,17 @@ bootstrap.plot <- function(x,
     stop("bootstrap_plot function only applicable to class jointVIP only!")
   }
   
-  OVB_curves = list(...)[['OVB_curves']]
-  if (is.null(OVB_curves)) {
-    if (smd == 'OVB-based') {
-      specified_OVB_curves = TRUE
+  bias_curves = list(...)[['bias_curves']]
+  if (is.null(bias_curves)) {
+    if (smd == "cross-sample") {
+      specified_bias_curves = TRUE
     } else {
-      specified_OVB_curves = FALSE
+      specified_bias_curves = FALSE
     }
-  } else if (!is.logical(OVB_curves)) {
-    stop("`OVB_curves` can only be set as TRUE or FALSE")
+  } else if (!is.logical(bias_curves)) {
+    stop("`bias_curves` can only be set as TRUE or FALSE")
   } else {
-    specified_OVB_curves = OVB_curves
+    specified_bias_curves = bias_curves
   }
   
   p <-
@@ -1120,7 +1134,7 @@ bootstrap.plot <- function(x,
       x,
       ...,
       smd = smd,
-      OVB_curves = FALSE,
+      bias_curves = FALSE,
       use_abs = use_abs,
       plot_title = plot_title
     )
@@ -1172,8 +1186,8 @@ bootstrap.plot <- function(x,
       alpha = 0.4
     )
   
-  if (smd == "OVB-based" & specified_OVB_curves) {
-    p <- add_OVB_curves(
+  if (smd == "cross-sample" & specified_bias_curves) {
+    p <- add_bias_curves(
       p,
       use_abs = use_abs,
       measures = og,
