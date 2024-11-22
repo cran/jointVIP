@@ -1,6 +1,20 @@
 `jointVIP` News and Updates
 ======
 
+## jointVIP 1.0.0
+
+* corrected package paper details and ready for release and archive
+
+## jointVIP development version 0.1.2.001
+
+* Made documents more explicit on the user-inputs and edits for clarity
+
+* Added reviewer's suggestions on contribution guidelines
+
+* Added one-hot encoding to process data frames
+
+* Reorganized code as per reviewer's suggestion
+
 # jointVIP 0.1.2
 
 * Post-adjusted estimation for weights are now updated accordingly
@@ -15,7 +29,7 @@
 
 * Fixed a bug with NA measures
 
-# jointVIP development version on 0.1.1
+## jointVIP development version 0.1.1.001
 
 * Current version hosted on GitHub
 
